@@ -9,6 +9,14 @@
 import Foundation
 import Moya
 
+class NetworkAPI {
+    var endpoint: String
+
+    init(endpoint: String) {
+        self.endpoint = endpoint
+    }
+}
+
 enum NetworkService {
     case getAccount(String)
 }
