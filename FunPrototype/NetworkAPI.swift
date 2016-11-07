@@ -11,19 +11,37 @@ import Moya
 
 class NetworkAPI {
     var endpoint: String
+    var service: NetworkService?
+    var provider = MoyaProvider<NetworkAPI>()
 
     init(endpoint: String) {
         self.endpoint = endpoint
     }
+
+    func get(_ service: NetworkService, completion: @escaping (Dictionary<String, Any>?)->()) {
+        self.service = service
+        provider.request(self) { result in
+            switch result {
+            case let .success(response):
+                do {
+                    if let json = try response.mapJSON() as? Dictionary<String, Any> {
+                        completion(json)
+                    }
+                } catch {}
+            case .failure(_):
+                break
+            }
+        }
+    }
 }
 
 enum NetworkService {
-    case getAccount(String)
+    case accountInfo(number: String)
 }
 
-extension NetworkService: TargetType {
+extension NetworkAPI: TargetType {
     var baseURL: URL {
-        return URL(string: "https://baseurl.com")!
+        return URL(string: endpoint)!
     }
     
     var method: Moya.Method {
@@ -35,21 +53,16 @@ extension NetworkService: TargetType {
     }
     
     var parameters: [String: Any]? {
-        switch self {
-        case .getAccount(let accountNo):
-            return ["accountNo":accountNo]
+        if let service = self.service {
+            switch service {
+            case .accountInfo(let number):
+                return ["accountNo": number]
+            }
         }
+        return nil
     }
     var sampleData: Data {
-        switch self {
-        case .getAccount(let accountNo):
-            if accountNo == "1234567"{
-                return Data()
-            }
-            else {
-                return Data()
-            }
-        }
+        return Data()
     }
     var task:Task {
         return .request

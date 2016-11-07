@@ -10,39 +10,17 @@ import UIKit
 import Moya
 
 class ViewController: UIViewController {
-    var accountNo: String?
     var name: String?
-    var provider = MoyaProvider<NetworkService>()
+    var accountNumber: String?
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.name = "John Doe"
-        requestAccountInfo(accountNo: "1234567")
-    }
+    var networkAPI = NetworkAPI(endpoint: "https://test.com")
 
-    func requestAccountInfo(accountNo: String) -> String {
-        self.provider.request(.getAccount(accountNo)) { result in
-
-                switch result {
-                case let .success(response):
-                    do {
-                        if let json = try response.mapJSON() as? NSDictionary {
-                            print(json)
-                            self.createAccount(jsonAccount: json)
-                        }
-                    } catch {
-                        
-                    }
-                case .failure(_):
-                    break
-                }
-            }
-        return ""
-    }
-    
-    func createAccount(jsonAccount : NSDictionary) {
-        name = jsonAccount["name"] as? String
-        accountNo = jsonAccount["accountNo"] as? String
+    func requestAccountInfo(number: String) {
+        networkAPI.get(.accountInfo(number: number)) {
+            (data) in
+            self.name = data?["name"] as? String
+            self.accountNumber = data?["accountNumber"] as? String
+        }
     }
 }
 
