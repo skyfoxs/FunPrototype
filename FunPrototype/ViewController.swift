@@ -12,7 +12,7 @@ import Moya
 class ViewController: UIViewController {
     var accountNo: String?
     var name: String?
-    var provider = MoyaProvider<NetworkAPI>()
+    var provider = MoyaProvider<NetworkService>()
 
     override func viewDidLoad() {
         super.viewDidLoad()

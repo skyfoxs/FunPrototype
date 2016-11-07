@@ -12,7 +12,7 @@ import XCTest
 @testable import Moya
 @testable import Result
 
-extension NetworkAPI {
+extension NetworkService {
     var sampleData: Data {
         return "".data(using: .utf8)!
     }
@@ -37,9 +37,9 @@ class FunPrototypeTests: XCTestCase {
     func testGetAccountNameWithAccountNo3254120ShouldReturnJohnDoe(){
         // arrange
         let viewcontroller = ViewController()
-        let xxxEndpointClosure = { (target: NetworkAPI) -> Endpoint<NetworkAPI> in
+        let xxxEndpointClosure = { (target: NetworkService) -> Endpoint<NetworkService> in
             print(target.baseURL.absoluteString)
-            let endpoint: Endpoint<NetworkAPI> = Endpoint<NetworkAPI>(URL: target.baseURL.absoluteString,
+            let endpoint: Endpoint<NetworkService> = Endpoint<NetworkService>(URL: target.baseURL.absoluteString,
                                                                       sampleResponseClosure: { .networkResponse(200, "{\"accountNo\": \"3254120\", \"name\": \"John Doe\"}".data(using: String.Encoding.utf8)!) },
                                                                       method: target.method,
                                                                       parameters: target.parameters)
@@ -47,7 +47,7 @@ class FunPrototypeTests: XCTestCase {
             return endpoint
         }
         
-        viewcontroller.provider = MoyaProvider<NetworkAPI>(endpointClosure: xxxEndpointClosure, stubClosure: MoyaProvider.ImmediatelyStub)
+        viewcontroller.provider = MoyaProvider<NetworkService>(endpointClosure: xxxEndpointClosure, stubClosure: MoyaProvider.ImmediatelyStub)
         
         // act
         _ = viewcontroller.requestAccountInfo(accountNo: "3254120")
@@ -57,12 +57,12 @@ class FunPrototypeTests: XCTestCase {
     func testGetAccountNameWithAccountNo1234567ShouldReturnMaryZoo () {
         // arrange
         let viewcontroller = ViewController()
-        let xxxEndpointClosure = { (target: NetworkAPI) -> Endpoint<NetworkAPI> in
+        let xxxEndpointClosure = { (target: NetworkService) -> Endpoint<NetworkService> in
             print(target.baseURL.absoluteString)
             print(target.path)
             print(target.parameters)
             
-            let endpoint: Endpoint<NetworkAPI> = Endpoint<NetworkAPI>(URL: target.baseURL.absoluteString,
+            let endpoint: Endpoint<NetworkService> = Endpoint<NetworkService>(URL: target.baseURL.absoluteString,
                                                               sampleResponseClosure: { .networkResponse(200, "{\"accountNo\": \"1234567\", \"name\": \"Mary Zoo\"}".data(using: String.Encoding.utf8)!) },
                                                               method: target.method,
                                                               parameters: target.parameters)
@@ -70,7 +70,7 @@ class FunPrototypeTests: XCTestCase {
             return endpoint
         }
         
-        viewcontroller.provider = MoyaProvider<NetworkAPI>(endpointClosure: xxxEndpointClosure, stubClosure: MoyaProvider.ImmediatelyStub)
+        viewcontroller.provider = MoyaProvider<NetworkService>(endpointClosure: xxxEndpointClosure, stubClosure: MoyaProvider.ImmediatelyStub)
         
         // act
         _ = viewcontroller.requestAccountInfo(accountNo: "1234567")
@@ -80,6 +80,15 @@ class FunPrototypeTests: XCTestCase {
     }
 
     func testGetAccountNameExpectURLAndHeader() {
+
+        let MoyaEndpointClosure = { (target: NetworkService) -> Endpoint<NetworkService> in
+            let endpoint: Endpoint<NetworkService> = Endpoint<NetworkService>(URL: url(target),
+                                                                              sampleResponseClosure: { .networkResponse(200, target.sampleData) },
+                                                                              method: target.method,
+                                                                              parameters: target.parameters).endpointByAddingHTTPHeaderFields(["Authorization": "Sense"])
+            
+            return endpoint
+        }
         // arrange
         var expectedURL : String!
         var expectedAuthorizationHeader : String!
@@ -91,7 +100,7 @@ class FunPrototypeTests: XCTestCase {
         
         let viewcontroller = ViewController()
         
-        viewcontroller.provider = MoyaProvider<NetworkAPI>(endpointClosure: MoyaEndpointClosure,stubClosure: MoyaProvider.ImmediatelyStub, plugins:[plugin])
+        viewcontroller.provider = MoyaProvider<NetworkService>(endpointClosure: MoyaEndpointClosure,stubClosure: MoyaProvider.ImmediatelyStub, plugins:[plugin])
         
         // act
         _ = viewcontroller.requestAccountInfo(accountNo: "1234567")

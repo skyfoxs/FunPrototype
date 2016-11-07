@@ -9,21 +9,11 @@
 import Foundation
 import Moya
 
-let MoyaEndpointClosure = { (target: NetworkAPI) -> Endpoint<NetworkAPI> in
-    let endpoint: Endpoint<NetworkAPI> = Endpoint<NetworkAPI>(URL: url(target),
-                                                      sampleResponseClosure: { .networkResponse(200, target.sampleData) },
-                                                      method: target.method,
-                                                      parameters: target.parameters).endpointByAddingHTTPHeaderFields(["Authorization": "Sense"])
-    
-    return endpoint
-}
-
-
-enum NetworkAPI {
+enum NetworkService {
     case getAccount(String)
 }
 
-extension NetworkAPI: TargetType {
+extension NetworkService: TargetType {
     var baseURL: URL {
         return URL(string: "https://baseurl.com")!
     }
